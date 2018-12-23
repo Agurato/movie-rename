@@ -130,4 +130,4 @@ if __name__ == '__main__':
             save_output(new_names, not_found)
 
             # Rename
-            rename_files(path, new_names)
+            # rename_files(path, new_names)
