@@ -31,6 +31,7 @@ class Multiplexer:
             if len(movie_dots) > 2:
                 sub_params += f" --language 0:{movie_dots[-2]} ( \"{sub}\" )"
             else:
+                # sub_params += f" --language 0:en ( \"{sub}\" )"
                 self.failed = True
                 self.msg = "No language in srt name"
 
@@ -53,8 +54,8 @@ class Multiplexer:
             try:
                 subprocess.check_output(self.mkvmerge_path + "  " + params, stderr=subprocess.STDOUT, shell=True)
             except subprocess.CalledProcessError as e:
-                print(str(e.returncode) + "\n" + e.output)
-                sys.exit(1)
+                self.failed = True
+                self.msg = str(e.output)
 
     def clean(self):
         for s in self.subtitles:
@@ -74,7 +75,7 @@ def get_movies(root_dir):
     for root, directories, filenames in os.walk(root_dir):
         for f in filenames:
             file_mime = mimetypes.guess_type(f)[0]
-            if 'video/' in file_mime:
+            if file_mime is not None and 'video/' in file_mime:
                 movies.append(os.path.join(root, f))
 
     return movies

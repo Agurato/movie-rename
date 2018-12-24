@@ -21,7 +21,7 @@ def list_files(path, change_mimetypes):
     for f in all_files:
         file_mime = mimetypes.guess_type(f)[0]
         for mime in change_mimetypes:
-            if mime in file_mime:
+            if file_mime is not None and mime in file_mime:
                 need_change.append(f)
 
     return need_change
@@ -95,10 +95,10 @@ def save_output(new_names, not_found):
     if not exists(output_dir):
         makedirs(output_dir)
 
-    with open(join(output_dir, now_string+' - new_names.json'), 'w') as new_names_json:
-        json.dump(new_names, new_names_json)
-    with open(join(output_dir, now_string+' - not_found.json'), 'w') as not_found_json:
-        json.dump(not_found, not_found_json)
+    with open(join(output_dir, now_string+' - new_names.json'), 'w', encoding='utf8') as new_names_json:
+        json.dump(obj=new_names, fp=new_names_json, ensure_ascii=False)
+    with open(join(output_dir, now_string+' - not_found.json'), 'w', encoding='utf8') as not_found_json:
+        json.dump(obj=not_found, fp=not_found_json, ensure_ascii=False)
 
 
 def rename_files(path, new_names):
@@ -130,4 +130,4 @@ if __name__ == '__main__':
             save_output(new_names, not_found)
 
             # Rename
-            # rename_files(path, new_names)
+            rename_files(path, new_names)
