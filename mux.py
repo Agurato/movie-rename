@@ -2,6 +2,7 @@ import mimetypes
 import os
 import subprocess
 import sys
+from shutil import move
 
 
 class Multiplexer:
@@ -25,15 +26,16 @@ class Multiplexer:
         for sub in self.subtitles:
             sub_filename = os.path.basename(sub)
             movie_dots = sub_filename.split(".")
-            if 'forced' in movie_dots[-2]:
+            sub_info = sub_filename[self.ext_index:sub_filename.rfind(".")][1:]
+            if 'forced' in sub_info:
                 self.failed = True
                 self.msg = "Forced subtitle"
-            if len(movie_dots) > 2:
-                sub_params += f" --language 0:{movie_dots[-2]} ( \"{sub}\" )"
+            if len(sub_info) == 2:
+                sub_params += f" --language 0:{sub_info} ( \"{sub}\" )"
             else:
-                # sub_params += f" --language 0:en ( \"{sub}\" )"
-                self.failed = True
-                self.msg = "No language in srt name"
+                sub_params += f" --language 0:en ( \"{sub}\" )"
+                # self.failed = True
+                # self.msg = "No language in srt name"
 
         track_order = ""
         if len(self.subtitles) == 0:
@@ -58,10 +60,18 @@ class Multiplexer:
                 self.msg = str(e.output)
 
     def clean(self):
-        for s in self.subtitles:
-            os.remove(s)
-        os.remove(self.movie_path)
-        os.rename(self.output_path, self.movie_path)
+        try:
+            for s in self.subtitles:
+                os.remove(s)
+            os.remove(self.movie_path)
+        except PermissionError as e:
+            self.failed = True
+            self.msg = str(e.strerror)
+        try:
+            move(self.output_path, self.movie_path)
+        except PermissionError as e:
+            self.failed = True
+            self.msg = "Need to clean"
 
 
 def get_movies(root_dir):
@@ -83,7 +93,7 @@ def get_movies(root_dir):
 
 def get_subtitles(parent_path, movie_name):
     """
-    Get subtitles from folder and movie name (without extension
+    Get subtitles from folder and movie name (without extension)
     :param parent_path:
     :param movie_name:
     :return:
