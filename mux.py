@@ -117,7 +117,7 @@ if __name__ == '__main__':
 
     max = -1
     count = 0
-    no_subtitles = True
+    no_subtitles = False
 
     if len(sys.argv) > 1:
         movies_path = sys.argv[1]
