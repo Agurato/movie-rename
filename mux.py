@@ -103,8 +103,7 @@ def get_subtitles(parent_path, movie_name):
 
     for f in all_files:
         if movie_name in f:
-            file_mime = mimetypes.guess_type(f)[0]
-            if file_mime == 'application/x-subrip':
+			if f.endswith(".srt"):
                 subtitles.append(os.path.join(parent_path, f))
 
     return subtitles
@@ -113,11 +112,11 @@ def get_subtitles(parent_path, movie_name):
 if __name__ == '__main__':
 
     failed_files = []
-    mkvmerge_path = "D:\\Logiciels\\Installations\\mkvtoolnix\\mkvmerge.exe"
+    mkvmerge_path = "D:\\Logiciels\\mkvtoolnix\\mkvmerge.exe"
 
     max = -1
     count = 0
-    no_subtitles = False
+    no_subtitles = True
 
     if len(sys.argv) > 1:
         movies_path = sys.argv[1]
