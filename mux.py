@@ -6,8 +6,8 @@ from shutil import move
 
 
 class Multiplexer:
-    def __init__(self, mkvmerge_path, movie_path):
-        self.mkvmerge_path = mkvmerge_path
+    def __init__(self, mkvtools_path, movie_path):
+        self.mkvtools_path = mkvtools_path
 
         self.movie_path = movie_path
         self.movie_name = os.path.basename(movie_path)
@@ -25,7 +25,6 @@ class Multiplexer:
         sub_params = f""
         for sub in self.subtitles:
             sub_filename = os.path.basename(sub)
-            movie_dots = sub_filename.split(".")
             sub_info = sub_filename[self.ext_index:sub_filename.rfind(".")][1:]
             if 'forced' in sub_info:
                 self.failed = True
@@ -34,8 +33,6 @@ class Multiplexer:
                 sub_params += f" --language 0:{sub_info} ( \"{sub}\" )"
             else:
                 sub_params += f" --language 0:en ( \"{sub}\" )"
-                # self.failed = True
-                # self.msg = "No language in srt name"
 
         track_order = ""
         if len(self.subtitles) == 0:
@@ -47,14 +44,19 @@ class Multiplexer:
             self.failed = True
             self.msg = "More than 2 subtitles"
 
+        get_track_number(self.mkvtools_path, self.movie_path)
+        track_names = ""
+        for index in range(0, get_track_number(self.mkvtools_path, self.movie_path)):
+            track_names += f" --track-name {index}:\"\""
+
         if not self.failed:
             nosub_param = ""
             if no_subtitles:
                 nosub_param = " --no-subtitles"
-            params = f"--output \"{self.output_path}\" {sub_params} {nosub_param} ( \"{self.movie_path}\" ) --title \"\" {track_order}"
+            params = f"--output \"{self.output_path}\" {sub_params} {nosub_param} {track_names} ( \"{self.movie_path}\" ) --title \"\" {track_order}"
             print("Muxing " + self.output_path)
             try:
-                subprocess.check_output(self.mkvmerge_path + "  " + params, stderr=subprocess.STDOUT, shell=True)
+                subprocess.check_output(self.mkvtools_path + "\\mkvmerge.exe  " + params, stderr=subprocess.STDOUT, shell=True)
             except subprocess.CalledProcessError as e:
                 self.failed = True
                 self.msg = str(e.output)
@@ -77,7 +79,7 @@ class Multiplexer:
 def get_movies(root_dir):
     """
     Get all movies
-    :param path: Folder where to search for files
+    :param root_dir: Folder where to search for files
     :return: Files filtered
     """
     movies = []
@@ -103,18 +105,42 @@ def get_subtitles(parent_path, movie_name):
 
     for f in all_files:
         if movie_name in f:
-			if f.endswith(".srt"):
+            if f.endswith(".srt"):
                 subtitles.append(os.path.join(parent_path, f))
 
     return subtitles
 
 
+def get_track_number(mkvtools_path, file):
+    """
+    Get track number in mkv file
+    :param mkvtools_path: path to MKVToolNix folder
+    :param file:
+    :return: number of tracks in file
+    """
+    file_info = subprocess.getoutput(f"{mkvtools_path}\\mkvinfo.exe \"{file}\"")
+    count_tracks = 0
+
+    record_tracks = False
+
+    for line in file_info.split("\n"):
+        if line == "|+ Tracks":
+            record_tracks = True
+        elif record_tracks:
+            if line.startswith("|+"):
+                record_tracks = False
+            elif line == "| + Track":
+                count_tracks += 1
+
+    return count_tracks
+
+
 if __name__ == '__main__':
 
     failed_files = []
-    mkvmerge_path = "D:\\Logiciels\\mkvtoolnix\\mkvmerge.exe"
+    mkvtools_path = "D:\\Logiciels\\mkvtoolnix"
 
-    max = -1
+    maximum = -1
     count = 0
     no_subtitles = True
 
@@ -122,9 +148,9 @@ if __name__ == '__main__':
         movies_path = sys.argv[1]
         movies = get_movies(movies_path)
         for movie in movies:
-            if count == max:
+            if count == maximum:
                 break
-            multiplexer = Multiplexer(mkvmerge_path, movie)
+            multiplexer = Multiplexer(mkvtools_path, movie)
             multiplexer.mux(no_subtitles)
             if multiplexer.failed:
                 failed_files.append((multiplexer.movie_path, multiplexer.msg))
