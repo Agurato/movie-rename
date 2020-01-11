@@ -85,7 +85,7 @@ if __name__ == "__main__":
     Extract subtitles from all mkv files in folder
     python extract_sub.py <folder> <lang1,lang2,...>
     """
-    mkvtoolnix_path = r"D:\Logiciels\mkvtoolnix"
+    mkvtoolnix_path = r"C:\Dossiers\Logiciels\mkvtoolnix"
     mkvextract = os.path.join(mkvtoolnix_path, "mkvextract.exe")
     mkvinfo = os.path.join(mkvtoolnix_path, "mkvinfo.exe")
 
