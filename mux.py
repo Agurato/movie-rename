@@ -138,11 +138,11 @@ def get_track_number(mkvtools_path, file):
 if __name__ == '__main__':
 
     failed_files = []
-    mkvtools_path = "C:\\Dossiers\\Logiciels\\mkvtoolnix\\mkvmerge.exe"
+    mkvtools_path = "C:\\Dossiers\\Logiciels\\mkvtoolnix"
 
     maximum = -1
     count = 0
-    no_subtitles = False
+    no_subtitles = True
 
     if len(sys.argv) > 1:
         movies_path = sys.argv[1]
