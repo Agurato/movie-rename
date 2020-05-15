@@ -53,7 +53,7 @@ class Multiplexer:
             nosub_param = ""
             if no_subtitles:
                 nosub_param = " --no-subtitles"
-            params = f"--output \"{self.output_path}\" {sub_params} {nosub_param} {track_names} ( \"{self.movie_path}\" ) --title \"\" {track_order}"
+            params = f"--output \"{self.output_path}\" {sub_params} {nosub_param} {track_names} ( \"{self.movie_path}\" ) --title \"{self.movie_name}\" {track_order}"
             print("Muxing " + self.output_path)
             try:
                 subprocess.check_output(self.mkvtools_path + "\\mkvmerge.exe  " + params, stderr=subprocess.STDOUT, shell=True)
