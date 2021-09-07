@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import mimetypes
 import os
 import subprocess
@@ -118,7 +120,7 @@ def get_track_number(mkvtools_path, file):
     :param file:
     :return: number of tracks in file
     """
-    file_info = subprocess.getoutput(f"{mkvtools_path}\\mkvinfo.exe \"{file}\"")
+    file_info = subprocess.Popen(f"{mkvtools_path}\\mkvinfo.exe \"{file}\"", shell=True, stdout=subprocess.PIPE).stdout.read().decode("utf-8")
     count_tracks = 0
 
     record_tracks = False
@@ -138,7 +140,7 @@ def get_track_number(mkvtools_path, file):
 if __name__ == '__main__':
 
     failed_files = []
-    mkvtools_path = "C:\\Dossiers\\Logiciels\\mkvtoolnix"
+    mkvtools_path = r"D:\Logiciels\mkvtoolnix"
 
     maximum = -1
     count = 0

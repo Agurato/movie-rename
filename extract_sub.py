@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import subprocess
 import sys
@@ -37,7 +39,7 @@ def get_tracks(mkvinfo, mkv_file):
     :return: list of tracks of input file
     """
     tracks = []
-    file_info = subprocess.getoutput(f'{mkvinfo} "{mkv_file}"')
+    file_info = subprocess.Popen(f'{mkvinfo} "{mkv_file}"', shell=True, stdout=subprocess.PIPE).stdout.read().decode("utf-8")
 
     record_tracks = False
     current_track_id = -1
@@ -51,7 +53,7 @@ def get_tracks(mkvinfo, mkv_file):
                 record_tracks = False
             elif line == "| + Track":
                 if current_track_id != -1:
-                    current_track_lang = languages.get(part2b=current_track_lang).part1
+                    # current_track_lang = languages.get(part2b=current_track_lang).part1
                     tracks.append(
                         Track(current_track_id, current_track_type, current_track_lang)
                     )
@@ -64,7 +66,11 @@ def get_tracks(mkvinfo, mkv_file):
                 elif "Track type" in line:
                     current_track_type = line.split(" ")[5]
                 elif "Language" in line:
-                    current_track_lang = line.split(" ")[4]
+                    line_split = line.split(" ")
+                    if len(line_split) > 5:
+                        current_track_lang = line_split[7]
+                    else:
+                        current_track_lang = line_split[4]
                     if current_track_lang == "und":
                         current_track_lang = "eng"
 
@@ -85,7 +91,7 @@ if __name__ == "__main__":
     Extract subtitles from all mkv files in folder
     python extract_sub.py <folder> <lang1,lang2,...>
     """
-    mkvtoolnix_path = r"C:\Dossiers\Logiciels\mkvtoolnix"
+    mkvtoolnix_path = r"D:\Logiciels\mkvtoolnix"
     mkvextract = os.path.join(mkvtoolnix_path, "mkvextract.exe")
     mkvinfo = os.path.join(mkvtoolnix_path, "mkvinfo.exe")
 
