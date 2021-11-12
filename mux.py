@@ -43,7 +43,7 @@ class Multiplexer:
             sub_params += f" --language 0:{sub_lang}"
             if (
                 sub_lang != "fr" and "fr" in self.subtitles
-            ):  # If non french sub or if there is a french sub
+            ):  # If non french sub and if there is a french sub
                 sub_params += f" --default-track 0:0"
             sub_params += f' ( "{file}" )'
 
