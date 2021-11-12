@@ -81,7 +81,7 @@ class Multiplexer:
     def clean(self):
         try:
             for s in self.subtitles:
-                os.remove(s)
+                os.remove(self.subtitles[s])
             os.remove(self.movie_path)
         except PermissionError as e:
             self.failed = True
